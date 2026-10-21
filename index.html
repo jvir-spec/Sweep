@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Sweep AI is a student-built roadmap for data analysis, reporting and helpful AI models."
+    />
+    <title>Sweep AI — Making data easier to understand</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #172019;
+        --muted: #6f7c72;
+        --paper: #f4f7f1;
+        --card: #ffffff;
+        --lime: #d9f568;
+        --sage: #dfeadd;
+        --line: #d8e2d8;
+        --forest: #193c2a;
+        --blue: #dcecff;
+        --shadow: 0 20px 60px rgba(23, 32, 25, 0.08);
+        --radius: 22px;
+      }
+
+      * { box-sizing: border-box; scroll-behavior: smooth; }
+      body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Space Grotesk", Arial, sans-serif; }
+      body.modal-open { overflow: hidden; }
+      button, input { font: inherit; }
+      button, a { -webkit-tap-highlight-color: transparent; }
+      button { cursor: pointer; }
+      a { color: inherit; text-decoration: none; }
+      .site-shell { overflow: hidden; }
+      .section-wrap { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+
+      .site-header { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 22px; min-height: 78px; padding: 0 max(24px, calc((100vw - 1180px) / 2)); border-bottom: 1px solid rgba(216, 226, 216, 0.9); background: rgba(244, 247, 241, 0.86); backdrop-filter: blur(18px); }
+      .brand { display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0; }
+      .brand-mark { display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid var(--ink); border-radius: 12px; background: var(--lime); color: var(--ink); font-weight: 700; }
+      .brand strong, .brand small { display: block; }
+      .brand strong { font-size: 0.96rem; letter-spacing: -0.04em; }
+      .brand small { margin-top: 2px; color: var(--muted); font-family: "DM Mono", monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.04em; }
+      .main-nav { display: flex; align-items: center; gap: 26px; margin-left: auto; margin-right: 12px; color: var(--muted); font-size: 0.78rem; }
+      .main-nav a, .mobile-nav a { transition: color 0.2s ease; }
+      .main-nav a:hover, .mobile-nav a:hover { color: var(--ink); }
+      .header-actions { display: flex; align-items: center; gap: 13px; }
+      .text-button { border: 0; background: transparent; color: var(--ink); font-size: 0.78rem; }
+      .button { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 44px; padding: 0 17px; border: 1px solid transparent; border-radius: 10px; font-size: 0.76rem; font-weight: 600; transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
+      .button:hover { transform: translateY(-2px); }
+      .button span { font-size: 1rem; line-height: 0; }
+      .button-dark { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+      .button-dark:hover { background: var(--forest); border-color: var(--forest); }
+      .button-lime { background: var(--lime); color: var(--ink); }
+      .button-lime:hover { background: #c9e953; }
+      .button-ghost { border-color: var(--line); background: transparent; color: var(--ink); }
+      .button-ghost:hover { border-color: var(--ink); background: var(--card); }
+      .menu-button { display: none; width: 38px; height: 38px; padding: 8px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); }
+      .menu-button span { display: block; width: 20px; height: 1px; margin: 5px auto; background: var(--ink); }
+      .mobile-nav { position: absolute; top: calc(100% + 1px); left: 0; right: 0; display: grid; gap: 4px; padding: 18px 24px 22px; border-bottom: 1px solid var(--line); background: var(--paper); box-shadow: var(--shadow); }
+      .mobile-nav[hidden] { display: none; }
+      .mobile-nav a { padding: 11px 0; color: var(--muted); }
+      .mobile-nav .button { margin-top: 8px; }
+
+      .hero { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr); align-items: center; gap: 60px; min-height: 680px; padding-top: 90px; padding-bottom: 90px; }
+      .kicker, .eyebrow { color: var(--muted); font-family: "DM Mono", monospace; font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; }
+      .kicker { display: flex; align-items: center; gap: 9px; margin: 0 0 22px; }
+      .kicker-dot { width: 8px; height: 8px; border-radius: 50%; background: #55ae7a; box-shadow: 0 0 0 4px #d7f0df; }
+      h1, h2, h3, p { margin-top: 0; }
+      h1, h2 { letter-spacing: -0.08em; }
+      h1 { max-width: 650px; margin-bottom: 25px; font-size: clamp(3.8rem, 8vw, 7.8rem); line-height: 0.88; }
+      h1 em, h2 em { color: #4b996d; font-style: normal; }
+      .hero-lede { max-width: 530px; margin-bottom: 27px; color: var(--muted); font-size: 1.02rem; line-height: 1.65; }
+      .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+      .hero-note { max-width: 470px; margin: 28px 0 0; color: var(--muted); font-size: 0.73rem; line-height: 1.55; }
+      .hero-art { position: relative; min-height: 480px; border: 1px solid var(--line); border-radius: 42% 58% 52% 48% / 46% 42% 58% 54%; background: radial-gradient(circle at 50% 48%, rgba(217, 245, 104, 0.65) 0 8%, transparent 9%), linear-gradient(135deg, #deeddc, #cfe7f1 53%, #e1f17c); box-shadow: var(--shadow); transform: rotate(3deg); }
+      .hero-art::before, .hero-art::after { position: absolute; content: ""; border: 1px solid rgba(23, 32, 25, 0.18); border-radius: 50%; }
+      .hero-art::before { inset: 13% 8%; transform: rotate(-19deg); }
+      .hero-art::after { inset: 5% 20%; transform: rotate(31deg); }
+      .orbit { position: absolute; inset: 18% 14%; border: 1px solid rgba(23, 32, 25, 0.3); border-radius: 50%; }
+      .orbit-one { transform: rotate(54deg) scaleY(0.42); }
+      .orbit-two { transform: rotate(-27deg) scaleY(0.72); }
+      .orbit-three { inset: 29% 5%; transform: rotate(4deg) scaleY(0.25); }
+      .data-core { position: absolute; top: 50%; left: 50%; display: grid; width: 142px; height: 142px; place-content: center; border: 1px solid var(--ink); border-radius: 50%; background: var(--ink); color: var(--lime); text-align: center; transform: translate(-50%, -50%) rotate(-3deg); box-shadow: 0 12px 30px rgba(23, 32, 25, 0.22); }
+      .core-letter { display: block; font-size: 3.8rem; font-weight: 700; line-height: 0.8; letter-spacing: -0.12em; }
+      .core-label { margin-top: 13px; font-family: "DM Mono", monospace; font-size: 0.54rem; line-height: 1.4; letter-spacing: 0.12em; }
+      .data-chip { position: absolute; padding: 8px 10px; border: 1px solid var(--ink); border-radius: 6px; background: var(--paper); color: var(--ink); font-family: "DM Mono", monospace; font-size: 0.58rem; box-shadow: 4px 4px 0 rgba(23, 32, 25, 0.14); }
+      .chip-one { top: 19%; left: 12%; }
+      .chip-two { right: 8%; top: 39%; background: var(--lime); }
+      .chip-three { bottom: 16%; left: 28%; }
+      .signal { position: absolute; display: block; width: 9px; height: 9px; border-radius: 50%; background: var(--ink); }
+      .signal-one { top: 16%; right: 24%; }
+      .signal-two { bottom: 24%; right: 17%; background: #4b996d; }
+      .signal-three { bottom: 16%; left: 15%; background: #779de1; }
+
+      .proof-strip { display: grid; grid-template-columns: repeat(4, 1fr); margin-bottom: 140px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+      .proof-strip div { display: flex; align-items: center; gap: 16px; padding: 22px 18px; border-right: 1px solid var(--line); }
+      .proof-strip div:first-child { padding-left: 0; }
+      .proof-strip div:last-child { border-right: 0; }
+      .proof-strip strong { color: #4b996d; font-family: "DM Mono", monospace; font-size: 0.65rem; }
+      .proof-strip span { font-size: 0.82rem; }
+
+      .intro-section, .models-section, .roadmap-section, .about-section { padding-bottom: 145px; }
+      .section-heading { margin-bottom: 54px; }
+      .section-heading .eyebrow { margin-bottom: 18px; }
+      .section-heading h2 { max-width: 760px; margin-bottom: 0; font-size: clamp(2.8rem, 5.5vw, 5.8rem); line-height: 0.91; }
+      .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: start; }
+      .large-copy { max-width: 480px; font-size: clamp(1.45rem, 2.6vw, 2.2rem); line-height: 1.2; letter-spacing: -0.05em; }
+      .feature-list { border-top: 1px solid var(--line); }
+      .feature-item { display: grid; grid-template-columns: 48px 1fr; gap: 15px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+      .feature-number { color: #4b996d; font-family: "DM Mono", monospace; font-size: 0.68rem; }
+      .feature-item h3 { margin-bottom: 7px; font-size: 1.02rem; }
+      .feature-item p { margin: 0; color: var(--muted); font-size: 0.78rem; line-height: 1.6; }
+      .split-heading { display: flex; align-items: end; justify-content: space-between; gap: 40px; }
+      .heading-aside { max-width: 340px; margin: 0 0 5px; color: var(--muted); font-size: 0.83rem; line-height: 1.6; }
+
+      .model-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+      .model-card { min-height: 330px; display: flex; flex-direction: column; padding: 21px; border: 1px solid var(--ink); border-radius: var(--radius); box-shadow: 8px 8px 0 rgba(23, 32, 25, 0.08); }
+      .model-card-light { background: var(--card); }
+      .model-card-dark { background: var(--ink); color: var(--paper); }
+      .model-card-lime { background: var(--lime); }
+      .model-card-outline { background: transparent; }
+      .model-topline, .model-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-family: "DM Mono", monospace; font-size: 0.6rem; text-transform: uppercase; }
+      .model-index { opacity: 0.65; }
+      .status-pill { padding: 6px 8px; border: 1px solid currentColor; border-radius: 20px; font-size: 0.53rem; opacity: 0.75; }
+      .model-card h3 { margin: 60px 0 14px; font-size: 1.8rem; letter-spacing: -0.07em; }
+      .model-description { max-width: 230px; margin: 0; color: var(--muted); font-size: 0.78rem; line-height: 1.55; }
+      .model-card-dark .model-description { color: #aebdb0; }
+      .model-footer { margin-top: auto; padding-top: 24px; border-top: 1px solid currentColor; opacity: 0.75; }
+      .quality-banner { display: flex; align-items: center; gap: 17px; margin-top: 18px; padding: 20px 22px; border-radius: 14px; background: var(--sage); }
+      .quality-icon { display: grid; width: 33px; height: 33px; flex-shrink: 0; place-items: center; border-radius: 50%; background: var(--ink); color: var(--lime); }
+      .quality-banner p { margin: 0; color: #48604d; font-size: 0.78rem; line-height: 1.55; }
+      .quality-banner strong { color: var(--ink); }
+
+      .roadmap { position: relative; display: grid; gap: 0; }
+      .roadmap-line { position: absolute; top: 10px; bottom: 10px; left: 20px; width: 1px; background: var(--line); }
+      .roadmap-item { position: relative; display: grid; grid-template-columns: 52px 190px 1fr; gap: 28px; padding: 0 0 60px; }
+      .roadmap-item:last-child { padding-bottom: 0; }
+      .roadmap-marker { z-index: 1; display: grid; width: 41px; height: 41px; place-items: center; border: 1px solid var(--ink); border-radius: 50%; background: var(--paper); color: var(--ink); font-family: "DM Mono", monospace; font-size: 0.64rem; }
+      .roadmap-current .roadmap-marker { background: var(--lime); }
+      .roadmap-date { padding-top: 11px; font-family: "DM Mono", monospace; font-size: 0.68rem; text-transform: uppercase; }
+      .roadmap-date span { display: block; margin-top: 7px; color: #4b996d; font-size: 0.57rem; }
+      .roadmap-content { max-width: 540px; padding: 9px 0 0; border-top: 1px solid var(--line); }
+      .roadmap-content h3 { margin-bottom: 9px; font-size: 1.35rem; letter-spacing: -0.05em; }
+      .roadmap-content p { margin-bottom: 15px; color: var(--muted); font-size: 0.79rem; line-height: 1.6; }
+      .roadmap-tag { display: inline-block; padding: 7px 9px; border-radius: 5px; background: var(--blue); color: #3e6794; font-family: "DM Mono", monospace; font-size: 0.58rem; text-transform: uppercase; }
+
+      .about-card { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 70px; align-items: center; padding: 70px; border-radius: 32px; background: var(--forest); color: var(--paper); }
+      .about-stamp { display: grid; width: 220px; height: 220px; place-items: center; border: 1px solid var(--lime); border-radius: 50%; color: var(--lime); font-family: "DM Mono", monospace; font-size: 0.82rem; line-height: 1.5; text-align: center; letter-spacing: 0.12em; transform: rotate(-13deg); }
+      .about-copy .eyebrow { color: #a4c5ab; }
+      .about-copy h2 { max-width: 610px; margin-bottom: 20px; font-size: clamp(2.5rem, 4.5vw, 5rem); line-height: 0.93; }
+      .about-copy h2 em { color: var(--lime); }
+      .about-copy p:not(.eyebrow):not(.about-disclaimer) { max-width: 560px; color: #c0d2c2; font-size: 0.86rem; line-height: 1.7; }
+      .about-disclaimer { max-width: 520px; margin: 26px 0; padding-left: 13px; border-left: 2px solid var(--lime); color: #a4c5ab; font-size: 0.7rem; line-height: 1.6; }
+      .join-section { display: flex; align-items: end; justify-content: space-between; gap: 50px; padding-bottom: 110px; }
+      .join-section h2 { margin: 11px 0 0; font-size: clamp(2.5rem, 5vw, 5.2rem); line-height: 0.92; }
+      .join-section > div:last-child { max-width: 330px; }
+      .join-section p { color: var(--muted); font-size: 0.82rem; line-height: 1.6; }
+      .join-section .button { margin-top: 8px; }
+      .site-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-top: 25px; padding-bottom: 28px; border-top: 1px solid var(--line); color: var(--muted); }
+      .site-footer p, .back-top { margin: 0; font-family: "DM Mono", monospace; font-size: 0.59rem; text-transform: uppercase; }
+      .back-top:hover { color: var(--ink); }
+
+      .modal[hidden] { display: none; }
+      .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 18px; background: rgba(13, 22, 15, 0.58); }
+      .modal-card { position: relative; width: min(460px, 100%); padding: 35px; border-radius: 22px; background: var(--card); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.24); }
+      .modal-close { position: absolute; top: 16px; right: 17px; width: 31px; height: 31px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--ink); font-size: 1.1rem; }
+      .modal-close:hover { border-color: var(--ink); }
+      .modal-card h2 { margin: 14px 0 9px; font-size: 2.5rem; line-height: 0.95; }
+      .modal-intro, .modal-footnote { color: var(--muted); font-size: 0.78rem; line-height: 1.55; }
+      .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin: 25px 0 20px; padding: 4px; border-radius: 9px; background: var(--sage); }
+      .auth-tab { padding: 10px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font-size: 0.76rem; }
+      .auth-tab.selected { background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(23, 32, 25, 0.08); }
+      .auth-form { display: grid; gap: 14px; }
+      .auth-form[hidden] { display: none; }
+      .auth-form label { display: grid; gap: 7px; color: var(--muted); font-size: 0.72rem; }
+      .auth-form input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; outline: 0; background: var(--paper); color: var(--ink); }
+      .auth-form input:focus { border-color: var(--ink); }
+      .full-width { width: 100%; margin-top: 4px; }
+      .form-message { min-height: 20px; margin: 13px 0 0; color: #a33737; font-size: 0.72rem; }
+      .modal-footnote { margin-bottom: 0; font-size: 0.68rem; }
+
+      @media (max-width: 950px) {
+        .main-nav { gap: 15px; }
+        .hero { grid-template-columns: 1fr; gap: 35px; padding-top: 65px; }
+        .hero-art { width: min(650px, 100%); min-height: 430px; margin: 0 auto; }
+        .model-grid { grid-template-columns: repeat(2, 1fr); }
+        .about-card { grid-template-columns: 1fr; gap: 40px; padding: 45px; }
+        .about-stamp { width: 165px; height: 165px; font-size: 0.66rem; }
+      }
+
+      @media (max-width: 700px) {
+        .site-header { min-height: 67px; padding: 0 18px; }
+        .main-nav, .header-actions .text-button { display: none; }
+        .menu-button { display: block; }
+        .header-actions { margin-left: auto; }
+        .site-header:has(.menu-button:hover) .mobile-nav,
+        .site-header:has(.menu-button:focus-visible) .mobile-nav { display: grid; }
+        .section-wrap { width: min(100% - 32px, 1180px); }
+        .hero { min-height: auto; padding-top: 55px; padding-bottom: 65px; }
+        h1 { font-size: clamp(3.6rem, 18vw, 6.2rem); }
+        .hero-art { min-height: 340px; border-radius: 39% 61% 55% 45% / 45% 43% 57% 55%; }
+        .data-core { width: 110px; height: 110px; }
+        .core-letter { font-size: 3rem; }
+        .proof-strip { grid-template-columns: 1fr 1fr; margin-bottom: 90px; }
+        .proof-strip div, .proof-strip div:first-child { padding: 16px 10px; }
+        .proof-strip div:nth-child(2) { border-right: 0; }
+        .proof-strip div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+        .section-heading, .split-heading { display: block; margin-bottom: 35px; }
+        .heading-aside { margin-top: 18px; }
+        .intro-grid { grid-template-columns: 1fr; gap: 35px; }
+        .intro-section, .models-section, .roadmap-section, .about-section { padding-bottom: 95px; }
+        .model-grid { grid-template-columns: 1fr; }
+        .model-card { min-height: 260px; }
+        .model-card h3 { margin-top: 35px; }
+        .roadmap-item { grid-template-columns: 44px 1fr; gap: 16px; }
+        .roadmap-date { grid-column: 2; grid-row: 1; padding-top: 8px; }
+        .roadmap-content { grid-column: 2; grid-row: 2; }
+        .roadmap-line { left: 20px; }
+        .join-section, .site-footer { display: block; }
+        .join-section > div:last-child { margin-top: 28px; }
+        .site-footer .brand { margin-bottom: 18px; }
+        .site-footer .back-top { display: inline-block; margin-top: 16px; }
+        .modal-card { padding: 30px 22px; }
+      }
+
+      @media (max-width: 430px) {
+        .header-actions .button { padding: 0 11px; font-size: 0.68rem; }
+        .hero-actions .button { width: 100%; }
+        .hero-art { min-height: 290px; }
+        .chip-one { left: 8%; }
+        .chip-two { right: 4%; }
+        .chip-three { left: 17%; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="site-shell">
+      <header class="site-header" id="top">
+        <a class="brand" href="#top" aria-label="Sweep AI home">
+          <span class="brand-mark">S</span>
+          <span>
+            <strong>Sweep AI</strong>
+            <small>data, understood</small>
+          </span>
+        </a>
+
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="#why-sweep">Why Sweep</a>
+          <a href="#models">Models</a>
+          <a href="#roadmap">Roadmap</a>
+          <a href="#about">About</a>
+        </nav>
+
+        <div class="header-actions">
+          <button class="text-button" id="loginButton" type="button">Log in</button>
+          <button class="button button-dark" id="signupButton" type="button">Sign up <span>↗</span></button>
+          <button class="menu-button" id="menuButton" type="button" aria-expanded="false" aria-controls="mobileNav">
+            <span></span><span></span>
+          </button>
+        </div>
+
+        <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation" hidden>
+          <a href="#why-sweep">Why Sweep</a>
+          <a href="#models">Models</a>
+          <a href="#roadmap">Roadmap</a>
+          <a href="#about">About</a>
+          <button class="button button-dark" id="mobileSignupButton" type="button">Sign up ↗</button>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero section-wrap">
+          <div class="hero-copy">
+            <p class="kicker"><span class="kicker-dot"></span> An independent student project</p>
+            <h1>Helping big data make more <em>sense.</em></h1>
+            <p class="hero-lede">
+              Sweep AI is a growing family of models designed to look at data, analyse patterns and turn complex information into clear reports.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-lime" href="#roadmap">See the roadmap <span>↓</span></a>
+              <button class="button button-ghost" id="heroSignupButton" type="button">Join the build <span>↗</span></button>
+            </div>
+            <p class="hero-note">Built by a Year 7 student with a big curiosity about what computers can help people understand.</p>
+          </div>
+
+          <div class="hero-art" aria-label="Abstract Sweep AI data visualisation" role="img">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div class="orbit orbit-three"></div>
+            <div class="data-core">
+              <span class="core-letter">S</span>
+              <span class="core-label">SWEEP<br />AI</span>
+            </div>
+            <span class="data-chip chip-one">LOOK</span>
+            <span class="data-chip chip-two">ANALYSE</span>
+            <span class="data-chip chip-three">REPORT</span>
+            <span class="signal signal-one"></span>
+            <span class="signal signal-two"></span>
+            <span class="signal signal-three"></span>
+          </div>
+        </section>
+
+        <section class="proof-strip section-wrap" aria-label="Sweep AI capabilities">
+          <div><strong>01</strong><span>Look at data</span></div>
+          <div><strong>02</strong><span>Analyse patterns</span></div>
+          <div><strong>03</strong><span>Report clearly</span></div>
+          <div><strong>04</strong><span>Improve over time</span></div>
+        </section>
+
+        <section class="intro-section section-wrap" id="why-sweep">
+          <div class="section-heading">
+            <p class="eyebrow">01 / Why Sweep</p>
+            <h2>Not just another chatbot. A direction for useful models.</h2>
+          </div>
+          <div class="intro-grid">
+            <p class="large-copy">
+              The idea behind Sweep is simple: make models that can help people work through large databases without making the information feel impossible to use.
+            </p>
+            <div class="feature-list">
+              <article class="feature-item">
+                <span class="feature-number">01</span>
+                <div><h3>See the signal</h3><p>Find useful information inside large, messy collections of data.</p></div>
+              </article>
+              <article class="feature-item">
+                <span class="feature-number">02</span>
+                <div><h3>Explain the result</h3><p>Turn analysis into reports that are easier for people to read and act on.</p></div>
+              </article>
+              <article class="feature-item">
+                <span class="feature-number">03</span>
+                <div><h3>Keep getting better</h3><p>As the models become more advanced, the goal is to produce higher-quality results.</p></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="models-section section-wrap" id="models">
+          <div class="section-heading split-heading">
+            <div><p class="eyebrow">02 / The model family</p><h2>Different stages.<br /><em>One clear purpose.</em></h2></div>
+            <p class="heading-aside">Every release is a step toward models that can look at more data, reason about it more carefully and create better reports.</p>
+          </div>
+
+          <div class="model-grid">
+            <article class="model-card model-card-light">
+              <div class="model-topline"><span class="model-index">01</span><span class="status-pill">In progress</span></div>
+              <h3>Sweep.1</h3>
+              <p class="model-description">The first preview: a starting point for looking at data and explaining what it finds.</p>
+              <div class="model-footer"><span>Preview</span><span>Jan 2027</span></div>
+            </article>
+            <article class="model-card model-card-dark">
+              <div class="model-topline"><span class="model-index">02</span><span class="status-pill">Lightweight</span></div>
+              <h3>Sweep Lite</h3>
+              <p class="model-description">A smaller, quicker version for straightforward analysis and useful summaries.</p>
+              <div class="model-footer"><span>Release target</span><span>Mar 2027</span></div>
+            </article>
+            <article class="model-card model-card-lime">
+              <div class="model-topline"><span class="model-index">03</span><span class="status-pill">Desktop SaaS</span></div>
+              <h3>Sweep Latest</h3>
+              <p class="model-description">A more capable model that runs on your computer, built for deeper analysis and reporting.</p>
+              <div class="model-footer"><span>Release target</span><span>Late Jun 2027</span></div>
+            </article>
+            <article class="model-card model-card-outline">
+              <div class="model-topline"><span class="model-index">04</span><span class="status-pill">Desktop SaaS</span></div>
+              <h3>Sweep Ultra</h3>
+              <p class="model-description">The long-term, highest-capability goal: a SaaS model that runs on your computer for the best quality results.</p>
+              <div class="model-footer"><span>Release target</span><span>Late Oct 2027</span></div>
+            </article>
+          </div>
+
+          <div class="quality-banner"><span class="quality-icon">✦</span><p><strong>The principle:</strong> as the models get more advanced, the aim is to deliver better-quality results — with clear limits, careful testing and people still in control.</p></div>
+        </section>
+
+        <section class="roadmap-section section-wrap" id="roadmap">
+          <div class="section-heading split-heading">
+            <div><p class="eyebrow">03 / Roadmap</p><h2>A vertical path<br /><em>from idea to impact.</em></h2></div>
+            <p class="heading-aside">The dates are targets, not promises. Building good models takes testing, learning and time.</p>
+          </div>
+
+          <div class="roadmap">
+            <div class="roadmap-line"></div>
+            <article class="roadmap-item roadmap-current">
+              <div class="roadmap-marker">01</div>
+              <div class="roadmap-date">January 2027 <span>next milestone</span></div>
+              <div class="roadmap-content"><h3>Finish building Sweep.1 preview</h3><p>The first public preview focused on looking at data, finding patterns and creating simple explanations.</p><span class="roadmap-tag">Preview release</span></div>
+            </article>
+            <article class="roadmap-item">
+              <div class="roadmap-marker">02</div>
+              <div class="roadmap-date">March 2027 <span>lightweight release</span></div>
+              <div class="roadmap-content"><h3>Release Sweep Lite</h3><p>A faster, lighter model for useful summaries and everyday data questions.</p><span class="roadmap-tag">Small + useful</span></div>
+            </article>
+            <article class="roadmap-item">
+              <div class="roadmap-marker">03</div>
+              <div class="roadmap-date">Late June 2027 <span>deeper analysis</span></div>
+              <div class="roadmap-content"><h3>Launch Sweep Latest</h3><p>A desktop SaaS model that runs on your computer and aims to give stronger analysis and reporting.</p><span class="roadmap-tag">Runs on your computer</span></div>
+            </article>
+            <article class="roadmap-item">
+              <div class="roadmap-marker">04</div>
+              <div class="roadmap-date">Late October 2027 <span>long-term goal</span></div>
+              <div class="roadmap-content"><h3>Build Sweep Ultra</h3><p>The most advanced planned model: a computer-running SaaS experience for the highest-quality results Sweep can reach.</p><span class="roadmap-tag">Highest capability</span></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="about-section section-wrap" id="about">
+          <div class="about-card">
+            <div class="about-stamp">MADE<br />WITH<br />CURIOSITY</div>
+            <div class="about-copy">
+              <p class="eyebrow">04 / The person behind it</p>
+              <h2>I’m a Year 7 student building toward something <em>useful.</em></h2>
+              <p>I’m trying to make models that can help with big databases by looking at data, analysing it and reporting what matters. Sweep is still being built, so this website is a place to share the idea, the roadmap and the progress.</p>
+              <p class="about-disclaimer">Sweep is an independent learning project. The release dates and capabilities shown here are goals for the future, not currently available products.</p>
+              <button class="button button-dark" id="aboutSignupButton" type="button">Follow the journey <span>↗</span></button>
+            </div>
+          </div>
+        </section>
+
+        <section class="join-section section-wrap">
+          <div><p class="eyebrow">Stay close to the build</p><h2>Want to see where Sweep goes?</h2></div>
+          <div><p>Sign up for this prototype so you can save an account and be ready for future updates.</p><button class="button button-lime" id="joinSignupButton" type="button">Create an account <span>↗</span></button></div>
+        </section>
+      </main>
+
+      <footer class="site-footer section-wrap">
+        <a class="brand" href="#top"><span class="brand-mark">S</span><span><strong>Sweep AI</strong><small>student-built intelligence</small></span></a>
+        <p>© 2026 Sweep AI · An educational prototype</p>
+        <a class="back-top" href="#top">Back to top ↑</a>
+      </footer>
+    </div>
+
+    <div class="modal" id="authModal" hidden aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+        <button class="modal-close" type="button" data-close="authModal" aria-label="Close">×</button>
+        <p class="eyebrow">Sweep AI community</p>
+        <h2 id="authTitle">Welcome back.</h2>
+        <p class="modal-intro" id="authIntro">Log in to keep your place in the Sweep journey.</p>
+        <div class="auth-tabs"><button class="auth-tab selected" id="loginTab" type="button">Log in</button><button class="auth-tab" id="signupTab" type="button">Sign up</button></div>
+        <form class="auth-form" id="loginForm">
+          <label>Email address<input id="loginEmail" type="email" required placeholder="you@example.com" /></label>
+          <label>Password<input id="loginPassword" type="password" required placeholder="Your password" /></label>
+          <button class="button button-dark full-width" type="submit">Log in <span>↗</span></button>
+        </form>
+        <form class="auth-form" id="signupForm" hidden>
+          <label>Your name<input id="signupName" type="text" required placeholder="Your name" /></label>
+          <label>Email address<input id="signupEmail" type="email" required placeholder="you@example.com" /></label>
+          <label>Password<input id="signupPassword" type="password" minlength="6" required placeholder="At least 6 characters" /></label>
+          <button class="button button-dark full-width" type="submit">Create account <span>↗</span></button>
+        </form>
+        <p class="form-message" id="authMessage" role="status"></p>
+        <p class="modal-footnote">This prototype stores demo account details in your browser only. Never use a real password here.</p>
+      </div>
+    </div>
+
+    <script>
+      const USERS_KEY = "sweep_ai_users";
+      const SESSION_KEY = "sweep_ai_session";
+      const $ = selector => document.querySelector(selector);
+      const $$ = selector => document.querySelectorAll(selector);
+
+      let currentUser = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+
+      function getUsers() {
+        return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+      }
+
+      function saveUsers(users) {
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+      }
+
+      async function hashPassword(password) {
+        if (window.crypto && crypto.subtle) {
+          const data = new TextEncoder().encode(password);
+          const digest = await crypto.subtle.digest("SHA-256", data);
+          return Array.from(new Uint8Array(digest))
+            .map(byte => byte.toString(16).padStart(2, "0"))
+            .join("");
+        }
+
+        return btoa(unescape(encodeURIComponent(password)));
+      }
+
+      function makeId() {
+        if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+        return "user-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+      }
+
+      function openModal() {
+        const modal = $("#authModal");
+        modal.hidden = false;
+        modal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+        setTimeout(() => $("#loginEmail").focus(), 40);
+      }
+
+      function closeModal() {
+        const modal = $("#authModal");
+        modal.hidden = true;
+        modal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-open");
+      }
+
+      function setAuthMode(mode, message = "") {
+        const loginMode = mode === "login";
+        $("#loginForm").hidden = !loginMode;
+        $("#signupForm").hidden = loginMode;
+        $("#loginTab").classList.toggle("selected", loginMode);
+        $("#signupTab").classList.toggle("selected", !loginMode);
+        $("#authTitle").textContent = loginMode ? "Welcome back." : "Join the build.";
+        $("#authIntro").textContent = loginMode
+          ? "Log in to keep your place in the Sweep journey."
+          : "Create an account to follow the Sweep AI roadmap.";
+        $("#authMessage").textContent = message;
+      }
+
+      function setSession(user) {
+        currentUser = { id: user.id, name: user.name, email: user.email };
+        localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+        updateAuthButtons();
+      }
+
+      function updateAuthButtons() {
+        const label = currentUser ? `Hi, ${currentUser.name.split(" ")[0]}` : "Log in";
+        $("#loginButton").textContent = label;
+        $("#signupButton").textContent = currentUser ? "Log out ↗" : "Sign up ↗";
+        $("#mobileSignupButton").textContent = currentUser ? "Log out ↗" : "Sign up ↗";
+      }
+
+      function handleAuthAction() {
+        if (!currentUser) {
+          setAuthMode("login");
+          openModal();
+          return;
+        }
+
+        currentUser = null;
+        localStorage.removeItem(SESSION_KEY);
+        updateAuthButtons();
+        setAuthMode("login", "You have been logged out of this prototype.");
+      }
+
+      function openSignup() {
+        if (currentUser) {
+          handleAuthAction();
+          return;
+        }
+
+        setAuthMode("signup");
+        openModal();
+      }
+
+      $("#loginButton").addEventListener("click", () => {
+        if (currentUser) {
+          document.querySelector("#about").scrollIntoView({ behavior: "smooth" });
+          return;
+        }
+        setAuthMode("login");
+        openModal();
+      });
+
+      ["#signupButton", "#mobileSignupButton", "#heroSignupButton", "#aboutSignupButton", "#joinSignupButton"].forEach(selector => {
+        $(selector).addEventListener("click", openSignup);
+      });
+
+      $("#loginTab").addEventListener("click", () => setAuthMode("login"));
+      $("#signupTab").addEventListener("click", () => setAuthMode("signup"));
+      $("[data-close=authModal]").addEventListener("click", closeModal);
+      $("#authModal").addEventListener("click", event => {
+        if (event.target === $("#authModal")) closeModal();
+      });
+
+      $("#loginForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        const email = $("#loginEmail").value.trim().toLowerCase();
+        const password = $("#loginPassword").value;
+        const user = getUsers().find(item => item.email === email);
+
+        if (!user) {
+          $("#authMessage").textContent = "No demo account was found with that email.";
+          return;
+        }
+
+        if (await hashPassword(password) !== user.passwordHash) {
+          $("#authMessage").textContent = "That password does not match this demo account.";
+          return;
+        }
+
+        setSession(user);
+        $("#loginForm").reset();
+        closeModal();
+      });
+
+      $("#signupForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        const name = $("#signupName").value.trim();
+        const email = $("#signupEmail").value.trim().toLowerCase();
+        const password = $("#signupPassword").value;
+
+        if (password.length < 6) {
+          $("#authMessage").textContent = "Use at least 6 characters for this demo password.";
+          return;
+        }
+
+        const users = getUsers();
+        if (users.some(user => user.email === email)) {
+          $("#authMessage").textContent = "An account with that email already exists.";
+          return;
+        }
+
+        const user = { id: makeId(), name, email, passwordHash: await hashPassword(password) };
+        users.push(user);
+        saveUsers(users);
+        setSession(user);
+        $("#signupForm").reset();
+        closeModal();
+      });
+
+      $("#menuButton").addEventListener("click", () => {
+        const menu = $("#mobileNav");
+        const isOpen = !menu.hidden;
+        menu.hidden = isOpen;
+        $("#menuButton").setAttribute("aria-expanded", String(!isOpen));
+      });
+
+      $$(".mobile-nav a").forEach(link => {
+        link.addEventListener("click", () => {
+          $("#mobileNav").hidden = true;
+          $("#menuButton").setAttribute("aria-expanded", "false");
+        });
+      });
+
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && !$("#authModal").hidden) closeModal();
+      });
+
+      updateAuthButtons();
+    </script>
+  </body>
+</html>
